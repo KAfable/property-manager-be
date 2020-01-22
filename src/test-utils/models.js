@@ -42,7 +42,7 @@ const createTenantHistory = ({startDate, endDate, ...input} = {}) => {
   }
 }
 
-const createWorkorder = ({startDate, endDate, propertyId, ...input} = {}) => {
+const createWorkorder = ({startDate, endDate, propertyId, createdBy, ...input} = {}) => {
   const date = new Date()
   
   return {
@@ -52,6 +52,7 @@ const createWorkorder = ({startDate, endDate, propertyId, ...input} = {}) => {
     "startDate": startDate ? formatStandard(startDate) : formatStandard(date),
     "endDate": endDate ? formatStandard(endDate) : null,
     "propertyId": propertyId ? propertyId : 1,
+    "createdBy": createdBy ? createdBy : 3,
     ...input,
   }
 }

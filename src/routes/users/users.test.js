@@ -4,7 +4,7 @@ const {Db, Models} = require('../../test-utils')
 
 const jwt = require('../../lib/jwt')
 
-const createToken = user => 'Bearer ' + jwt.signToken({sub: user.email})
+const createToken = user => 'Bearer ' + jwt.signToken(user)
 
 const req = supertest(app)
 

@@ -4,11 +4,7 @@ const {Db, Models, Express} = require('../test-utils')
 
 const defaultUser = Models.createUser()
 
-const createToken = email => {
-  const token = jwt.signToken({sub: email})
-
-  return `Bearer ${token}`
-}
+const createToken = user => 'Bearer ' + jwt.signToken(user)
 
 beforeEach(async () => {
   await Db.reset()
@@ -23,7 +19,7 @@ describe('bearerAuth', () => {
     // arrange
     await Db.insertUsers(defaultUser)
     const req = Express.mockRequest({
-      headers: {authorization: createToken(defaultUser.email)},
+      headers: {authorization: createToken(defaultUser)},
     })
     const res = Express.mockResponse()
     const next = jest.fn()
@@ -38,7 +34,7 @@ describe('bearerAuth', () => {
   it('should set the correct user on `req.user`', async () => {
     const [insertedUser] = await Db.insertUsers(defaultUser)
     const req = Express.mockRequest({
-      headers: {authorization: createToken(defaultUser.email)},
+      headers: {authorization: createToken(defaultUser)},
     })
     const res = Express.mockResponse()
     const next = jest.fn()

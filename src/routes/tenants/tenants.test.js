@@ -18,12 +18,9 @@ afterAll(async () => {
 
 const defaultLandlord = Models.createLandlord()
 
-const createToken = email => {
-  const token = jwt.signToken({sub: email})
-  return 'Bearer ' + token
-}
+const createToken = user => 'Bearer ' + jwt.signToken(user)
 
-const defaultToken = createToken(defaultLandlord.email)
+const defaultToken = createToken(defaultLandlord)
 
 const testFixture = async () => {
   const users = await Db.insertUsers([
@@ -127,7 +124,7 @@ describe('POST /api/tenants', () => {
       ...tenant,
     }
 
-    const token = createToken(user2.email)
+    const token = createToken(user2)
 
     const results = await request
       .post(endpoint)
@@ -159,7 +156,7 @@ describe('POST /api/tenants', () => {
       ...tenant,
     }
 
-    const token = createToken(landlord2.email)
+    const token = createToken(landlord2)
 
     const results = await request
       .post(endpoint)
@@ -233,7 +230,7 @@ describe('GET /api/tenants', () => {
   it('should return a 401 if the user is a tenant', async () => {
     let {tenants} = await testFixture()
 
-    const token = createToken(tenants[0].email)
+    const token = createToken(tenants[0])
 
     let res = await request.get(endpoint).set('Authorzation', token)
 
@@ -290,7 +287,7 @@ describe('GET /api/tenants/:id', () => {
   it('should return 401 if not logged in as a landlord', async () => {
     const {tenants} = await testFixture()
 
-    const token = createToken(tenants[0].email)
+    const token = createToken(tenants[0])
     const res = await request.get(endpoint + 1).set('Authorization', token)
 
     expect(res.status).toBe(401)
@@ -299,7 +296,7 @@ describe('GET /api/tenants/:id', () => {
   it('should return 401 if the tenant does not belong to the landlord', async () => {
     const {landlord2} = await testFixture()
 
-    const token = createToken(landlord2.email)
+    const token = createToken(landlord2)
 
     const res = await request.get(endpoint + 3).set('Authorization', token)
 
@@ -309,7 +306,7 @@ describe('GET /api/tenants/:id', () => {
   it('should return 200 when successful', async () => {
     const {landlord} = await testFixture()
 
-    const token = createToken(landlord.email)
+    const token = createToken(landlord)
 
     const res = await request.get(endpoint + 3).set('Authorization', token)
 
@@ -319,7 +316,7 @@ describe('GET /api/tenants/:id', () => {
   it('should return the desired tenant', async () => {
     const {landlord, tenants} = await testFixture()
 
-    const token = createToken(landlord.email)
+    const token = createToken(landlord)
 
     const res = await request.get(endpoint + 3).set('Authorization', token)
 
@@ -349,7 +346,7 @@ describe('PUT /api/tenants/:id', () => {
       lastname: 'frederson',
     }
 
-    const token = createToken(tenants[1].email)
+    const token = createToken(tenants[1])
 
     const res = await request
       .put(endpoint)
@@ -367,7 +364,7 @@ describe('PUT /api/tenants/:id', () => {
       lastName: 'frederson',
     }
 
-    const token = createToken(landlord2.email)
+    const token = createToken(landlord2)
 
     const res = await request
       .put(endpoint)
@@ -386,7 +383,7 @@ describe('PUT /api/tenants/:id', () => {
     it('should return 400 if the email key is present', async () => {
       const {landlord} = await testFixture()
 
-      const token = createToken(landlord.email)
+      const token = createToken(landlord)
 
       const responses = await Promise.all([
         request
@@ -420,7 +417,7 @@ describe('PUT /api/tenants/:id', () => {
     const {landlord} = await testFixture()
     const input = {firstName: 'fred', lastName: 'frederson'}
 
-    const token = createToken(landlord.email)
+    const token = createToken(landlord)
     const res = await request
       .put(endpoint)
       .send(input)
@@ -433,7 +430,7 @@ describe('PUT /api/tenants/:id', () => {
     const {landlord, tenants} = await testFixture()
     const input = {firstName: 'fred', lastName: 'frederson'}
 
-    const token = createToken(landlord.email)
+    const token = createToken(landlord)
 
     const res = await request
       .put(endpoint)

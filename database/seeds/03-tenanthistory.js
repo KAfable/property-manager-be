@@ -1,4 +1,4 @@
-const { tenanthistory } = require('../seedData.js')
+const {tenanthistory} = require('../seedData.js')
 
 exports.seed = function(knex) {
   // console.log(tenanthistory)

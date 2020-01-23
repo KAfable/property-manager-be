@@ -1,4 +1,4 @@
-const { workorders } = require('../seedData.js')
+const {workorders} = require('../seedData.js')
 
 exports.seed = function(knex) {
   // Deletes ALL existing entries

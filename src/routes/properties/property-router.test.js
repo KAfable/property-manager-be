@@ -8,7 +8,7 @@ const request = supertest(app)
 const defaultLandlord = Models.createUser()
 const newProperty = Models.createProperty()
 
-const createToken = user => 'Bearer ' + jwt.signToken({sub: user.email})
+const createToken = user => 'Bearer ' + jwt.signToken(user)
 
 beforeEach(async () => {
   await Db.reset()

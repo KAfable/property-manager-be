@@ -2,7 +2,7 @@ const db = require('../../database/db.js')
 const cleaner = require('knex-cleaner')
 
 const seedData = require('../../database/seedData.js')
-const { users, properties, tenanthistory, workorders } = seedData
+const {users, properties, tenanthistory, workorders} = seedData
 
 const reset = async () => {
   try {
@@ -37,22 +37,22 @@ const insertTenantHistories = insertResourceIntoTable('tenanthistory')
 const getAllWorkorders = () => db.from('workorders as w')
 const insertWorkorders = insertResourceIntoTable('workorders as w')
 
-const seedTables = async (table) => {
+const seedTables = async table => {
   // Insert into Tables
-  switch(table) {
-    case "users": 
+  switch (table) {
+    case 'users':
       await insertUsers(users)
       break
-    case "properties": 
+    case 'properties':
       await insertProperties(properties)
       break
-    case "tenanthistory": 
+    case 'tenanthistory':
       await insertTenantHistories(tenanthistory)
       break
-    case "workorders": 
+    case 'workorders':
       await insertWorkorders(workorders)
       break
-    default: 
+    default:
       await insertUsers(users)
       await insertProperties(properties)
       await insertTenantHistories(tenanthistory)
@@ -60,29 +60,28 @@ const seedTables = async (table) => {
   }
 }
 
-const countResults = async (table) => {
+const countResults = async table => {
   let results
 
   // Select Table
-  switch(table) {
-    case "users": 
+  switch (table) {
+    case 'users':
       results = await getAllUsers()
       break
-    case "properties": 
+    case 'properties':
       results = await getAllProperties()
       break
-    case "tenanthistory": 
+    case 'tenanthistory':
       results = await getAllTenantHistory()
       break
-    case "workorders": 
+    case 'workorders':
       results = await getAllWorkorders()
       break
-    default: 
+    default:
       results = null
   }
 
   return results.length
-
 }
 
 module.exports = {
@@ -97,5 +96,5 @@ module.exports = {
   insertUsers,
   insertTenantHistories,
   insertWorkorders,
-  countResults
+  countResults,
 }

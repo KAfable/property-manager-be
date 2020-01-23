@@ -2,9 +2,19 @@
 const WOController = require('./workorders')
 const {Db, Models, Express} = require('../../test-utils')
 
-beforeAll(async () => {
+const testFixture = async () => {
+  const [landlord] = await Db.insertUsers(Models.createLandlord())
+  const [property] = await Db.insertProperties(Models.createProperty())
+
+  const [tenant] = await Db.insertUsers(
+    Models.createTenant({residenceId: property.id, landlordId: landlord.id}),
+  )
+
+  return {landlord, property, tenant}
+}
+
+beforeEach(async () => {
   await Db.reset()
-  await Db.seedTables()
 })
 
 afterAll(async () => {
@@ -13,54 +23,115 @@ afterAll(async () => {
 
 describe('Workorder Controllers', () => {
   describe('readAllByUser', () => {
-    it('readAllByUser should return status 200', async () => {
+    describe('[user.type="landlord"]', () => {
+      it('readAllByUser should return status 200', async () => {
+        const {tenant, landlord, property} = await testFixture()
+        const workOrders = await Db.insertWorkorders([
+          Models.createWorkorder({
+            createdBy: tenant.id,
+            propertyId: tenant.residenceId,
+          }),
+          Models.createWorkorder({
+            createdBy: landlord.id,
+            propertyId: property.id,
+          }),
+        ])
 
-      const req = Express.mockRequest({
-        user: {
-          id: 2,
-        },
+        const req = Express.mockRequest({
+          user: landlord,
+        })
+
+        const res = Express.mockResponse()
+
+        await WOController.readAllByUser(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(200)
+        expect(res.json).toHaveBeenCalledWith(workOrders)
       })
+    })
 
-      const res = Express.mockResponse()
+    describe('[user.type="tenant"]', () => {
+      it('readAllByUser should return status 200', async () => {
+        const {tenant, landlord, property} = await testFixture()
 
-      await WOController.readAllByUser(req, res)
+        const workOrders = await Db.insertWorkorders([
+          Models.createWorkorder({
+            createdBy: tenant.id,
+            propertyId: tenant.residenceId,
+          }),
+          Models.createWorkorder({
+            createdBy: landlord.id,
+            propertyId: property.id,
+          }),
+        ])
 
-      expect(res.status).toHaveBeenCalledWith(200)
-      expect(res.json).toHaveBeenCalledWith(expect.anything())
+        const req = Express.mockRequest({
+          user: tenant,
+        })
+
+        const res = Express.mockResponse()
+
+        await WOController.readAllByUser(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(200)
+        expect(res.json).toHaveBeenCalledWith(workOrders)
+      })
     })
   })
 
   describe('create', () => {
-    it('create should send a status of 201 when successfully creating a workorder', async () => {
+    describe('[user.type="landlord"]', () => {
+      it('create should send a status of 201 when successfully creating a workorder', async () => {
+        const {landlord, property} = await testFixture()
 
-      const input = Models.createWorkorder()
-      const req = Express.mockRequest({
-        body: input,
-        user: {
-          id: 1,
-        },
-        property: {
-          id: 2,
-        },
+        const input = Models.createWorkorder()
+
+        const req = Express.mockRequest({
+          body: input,
+          user: landlord,
+          property: {id: property.id},
+        })
+        const res = Express.mockResponse()
+
+        await WOController.create(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(201)
+        expect(res.json).toHaveBeenCalledWith(expect.anything())
       })
-      const res = Express.mockResponse()
+    })
 
-      await WOController.create(req, res)
+    describe('[user.type="tenant"]', () => {
+      it('create should send a status of 201 when successfully creating a workorder', async () => {
+        const {tenant} = await testFixture()
 
-      expect(res.status).toHaveBeenCalledWith(201)
-      expect(res.json).toHaveBeenCalledWith(expect.anything())
+        const input = Models.createWorkorder({
+          createdBy: tenant.id,
+          propertyId: tenant.residenceId,
+        })
+
+        const req = Express.mockRequest({
+          body: input,
+          user: tenant,
+          property: {id: tenant.residenceId},
+        })
+        const res = Express.mockResponse()
+
+        await WOController.create(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(201)
+        expect(res.json).toHaveBeenCalledWith(expect.anything())
+      })
     })
   })
 
-  describe('update', () => {
+  xdescribe('update', () => {
     it('update should send a status of 200 when successfully updating a workorder', async () => {
-
       const input = Models.createWorkorder()
       const req = Express.mockRequest({
         body: input,
         params: {
-          id: 1
-        }
+          id: 1,
+        },
       })
       const res = Express.mockResponse()
 
@@ -71,5 +142,4 @@ describe('Workorder Controllers', () => {
       // expect(res.json).toHaveBeenCalledWith(expect.objectContaining({...input, "id": 1}))
     })
   })
-
 })

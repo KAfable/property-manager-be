@@ -1,3 +1,4 @@
+const R = require('ramda')
 const User = require('../../models/user')
 const firebase = require('../../lib/firebase')
 const jwt = require('../../lib/jwt')
@@ -50,14 +51,11 @@ async function login(req, res) {
      * */
     await firebase.auth().signInWithEmailAndPassword(email, password)
 
-    const user = await User.findByEmail(email, [
-      'email',
-      'type',
-      'firstName',
-      'lastName',
-    ])
+    const foundUser = await User.findByEmail(email)
 
-    const token = jwt.signToken({sub: email})
+    const user = R.pick(['type', 'email', 'firstName', 'lastName'], foundUser)
+
+    const token = jwt.signToken(user)
 
     res.status(200).json({token, user})
   } catch (err) {

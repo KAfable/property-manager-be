@@ -2,12 +2,39 @@
 TODO: Still refactoring some things so they can be edited in this document.
   This will be the primary file to update the documents index page.
 */
-const seedData = require("../../database/seedData.js")
+// const {users} = require('../../database/seedData.js')
+const seedData = require('../../database/seedData.js')
 
 // #region - User variables
 
+// Users
+// const usersModels = []
+// users.forEach((x, i) => {
+//   usersModels.push({id: i + 1, ...x})
+// })
+
+// const landlordModel = {
+//   userId: 1,
+//   email: 'landlord@email.com',
+//   firstName: 'Firstname',
+//   lastName: 'Lastname',
+//   type: 'landlord',
+//   phone: '123-456-7890',
+// }
+// const devModel = {
+//   userId: 2,
+//   email: 'dev@email.com',
+//   type: 'dev',
+// }
+// const tenantModel = {
+//   userId: 3,
+//   email: 'tenant@email.com',
+//   type: 'tenant',
+// }
 const users = []
-seedData.users.forEach((x, i) => { users.push({ "id": i + 1, ...x }) })
+seedData.users.forEach((x, i) => {
+  users.push({id: i + 1, ...x})
+})
 
 const registerInput = {
   email: 'example@gmail.com',
@@ -32,7 +59,9 @@ const LoginReturn = {
 // #region - Properties variables
 
 const properties = []
-seedData.properties.forEach((x, i) => { properties.push({ "id": i + 1, ...x }) })
+seedData.properties.forEach((x, i) => {
+  properties.push({id: i + 1, ...x})
+})
 
 const addPropertyInput = {
   name: 'Property Name',
@@ -75,7 +104,9 @@ const updatePropertyReturn = {
 // #region - Tenant History variables
 
 const tenanthistory = []
-seedData.tenanthistory.forEach((x, i) => { tenanthistory.push({ "id": i + 1, ...x }) })
+seedData.tenanthistory.forEach((x, i) => {
+  tenanthistory.push({id: i + 1, ...x})
+})
 
 const tenantHistory = {
   id: 2,
@@ -112,38 +143,40 @@ const updateTenantHistoryReturn = {
 // #region - Work Order variables
 
 const workorders = []
-seedData.workorders.forEach((x, i) => { workorders.push({ "id": i + 1, ...x }) })
+seedData.workorders.forEach((x, i) => {
+  workorders.push({id: i + 1, ...x})
+})
 
 const addWorkorderInput = {
-  "title": "Short Description",
-  "description": "Description of the issue.",
-  "type": "electrical",
-  "startDate": "01-01-2020",
-  "endDate": null,
-  "propertyId": 1
+  title: 'Short Description',
+  description: 'Description of the issue.',
+  type: 'electrical',
+  startDate: '01-01-2020',
+  endDate: null,
+  propertyId: 1,
 }
 const addWorkorderReturn = {
-  "id": 4,
-  "title": "Short Description",
-  "description": "Description of the issue.",
-  "type": "electrical",
-  "startDate": "01-01-2020",
-  "endDate": null,
-  "propertyId": 1,
-  "createdBy": 5
+  id: 4,
+  title: 'Short Description',
+  description: 'Description of the issue.',
+  type: 'electrical',
+  startDate: '01-01-2020',
+  endDate: null,
+  propertyId: 1,
+  createdBy: 5,
 }
 const updateWorkorderInput = {
-  "endDate": "01-20-2020"
+  endDate: '01-20-2020',
 }
 const updateWorkorderReturn = {
-  "id": 3,
-  "title": "Third Workorder",
-  "description": "Description of the issue.",
-  "type": "plumbing",
-  "startDate": "01-16-2020",
-  "endDate": "01-20-2020",
-  "propertyId": 7,
-  "createdBy": 5
+  id: 3,
+  title: 'Third Workorder',
+  description: 'Description of the issue.',
+  type: 'plumbing',
+  startDate: '01-16-2020',
+  endDate: '01-20-2020',
+  propertyId: 7,
+  createdBy: 5,
 }
 
 //#endregion
@@ -295,8 +328,8 @@ const docs = {
       examples: tenantHistory,
     },
     'Work Orders': {
-      function: "modelsWorkorders()",
-      examples: workorders
+      function: 'modelsWorkorders()',
+      examples: workorders,
     },
     // 'Work Order History': {
     //   function: "test()",

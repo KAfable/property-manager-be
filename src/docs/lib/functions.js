@@ -127,13 +127,7 @@ function modelsWorkorders() {
 
   let header = '<h2>Tenant History Model</h2> '
   let outputContent =
-    header +
-    models(
-      '',
-      todo,
-      comment,
-      docs.models['Work Orders'].examples[0],
-    )
+    header + models('', todo, comment, docs.models['Work Orders'].examples[0])
   output(outputContent)
 }
 

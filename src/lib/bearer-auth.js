@@ -16,7 +16,7 @@ const bearerAuth = async (req, res, next) => {
     try {
       const token = jwt.decode(payload)
 
-      const user = await User.findByEmail(token.sub)
+      const user = await User.findByEmail(token.sub, token.type)
 
       /* eslint-disable-next-line */
       req.user = user

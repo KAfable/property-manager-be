@@ -1,7 +1,7 @@
 // Work Order Models
 const db = require('../../../database/db')
 
-const table = 'workorders'
+const table = 'workorders as w'
 
 module.exports = {
   // Create
@@ -10,10 +10,12 @@ module.exports = {
   get,
   getBy,
   getById,
+  getByLandlordId,
+  getAllByPropertyId,
   // Update
   update,
   // Delete
-  remove
+  remove,
 }
 
 //#region - CREATE
@@ -22,6 +24,7 @@ async function add(input, propertyId, userId) {
   const results = await db(table)
     .returning('id')
     .insert({...input, propertyId: propertyId, createdBy: userId})
+
   return getById(results[0])
 }
 
@@ -30,9 +33,7 @@ async function add(input, propertyId, userId) {
 //#region - READ
 
 async function get() {
-  const results = await db
-    .from(table)
-    .select('*')
+  const results = await db.from(table).select('*')
 
   return results || null
 }
@@ -42,6 +43,21 @@ async function getById(id) {
     .from(table)
     .select('*')
     .where({id})
+
+  return results || null
+}
+
+function getAllByPropertyId(propertyId) {
+  return getBy({propertyId})
+}
+
+async function getByLandlordId(id) {
+  const results = await db
+    .from(table)
+    .join('properties as p', 'p.id', 'w.propertyId')
+    .join('users as u', 'u.id', 'p.landlordId')
+    .select('w.*')
+    .where({'p.landlordId': id})
 
   return results || null
 }

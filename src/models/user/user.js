@@ -11,6 +11,8 @@ const landlordReturning = [
   'email',
 ]
 
+const tenantReturning = '*'
+
 async function create(input, returning = landlordReturning) {
   const [user] = await db
     .from(table)
@@ -24,10 +26,10 @@ function createTenant(input) {
   return create(input, '*')
 }
 
-async function findByEmail(email, returning = landlordReturning) {
+async function findByEmail(email, type) {
   const [user] = await db
     .from(table)
-    .select(returning)
+    .select(type === 'tenant' ? tenantReturning : landlordReturning)
     .where({email})
 
   return user || null

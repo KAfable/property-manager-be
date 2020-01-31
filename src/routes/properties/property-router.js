@@ -1,5 +1,6 @@
 const express = require('express')
 const PropertyController = require('../../controllers/properties')
+const Property = require('../../models/property')
 const bearerAuth = require('../../lib/bearer-auth')
 const requireAuth = require('../../lib/require-auth')
 const {requireLandlord} = require('../../middleware')
@@ -9,6 +10,38 @@ const Properties = require('../../models/property')
 const router = express.Router()
 
 router.use(bearerAuth, requireAuth)
+
+const checkPropertyExists = async (req, res, next) => {
+  try {
+    const property = await Property.getProperty(req.params.id)
+
+    if (!property) {
+      return res.sendStatus(404)
+    }
+
+    /* eslint-disable-next-line */
+    req.property = property
+    next()
+  } catch (err) {
+    console.error(err)
+
+    return res.status(500).send('Internal Server Error')
+  }
+}
+
+const requireAccess = (req, res, next) => {
+  const {user, property} = req
+
+  if (user.type === 'landlord' && user.id !== property.landlordId) {
+    return res.sendStatus(401)
+  }
+
+  if (user.type === 'tenant' && user.residenceId !== property.id) {
+    return res.sendStatus(401)
+  }
+
+  next()
+}
 
 const validateInput = getErrors => (req, res, next) => {
   const errors = getErrors(req.body)
@@ -86,13 +119,14 @@ router.post(
 //#region - READ
 
 // GET all properties
-router.get('/', requireLandlord, PropertyController.getAllByUser)
+router.get('/', PropertyController.getAllByUser)
 
 // GET property by id
 router.get(
   '/:id',
-  requireLandlord,
-  /* authorizeProperty? */ PropertyController.getById,
+  checkPropertyExists,
+  requireAccess,
+  PropertyController.getById,
 )
 
 router.get(

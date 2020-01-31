@@ -120,9 +120,64 @@ describe('Properties Routes', () => {
 
       expect(results.body.length).toBe(2)
     })
+
+    describe('[user.type="tenant"]', () => {
+      it('should return 200 status', async () => {
+        const [landlord] = await Db.insertUsers(Models.createLandlord())
+        const properties = await Db.insertProperties(
+          Models.createProperty({landlordId: landlord.id}),
+        )
+        const [property] = properties
+        const [tenant] = await Db.insertUsers(
+          Models.createTenant({
+            landlordId: landlord.id,
+            residenceId: property.id,
+            email: 'tenant@gmail.com',
+          }),
+        )
+
+        const token = createToken(tenant)
+
+        const res = await request
+          .get('/api/properties')
+          .set('Authorization', token)
+
+        expect(res.status).toBe(200)
+        expect(res.body).toEqual(properties)
+      })
+    })
+
+    // describe('[user.type="landlord"]', () => {
+
+    // })
   })
 
   describe("get: '/api/properties/:id' endpoint", () => {
+    describe('[user.type="tenant"]', () => {
+      it('should return 200 status', async () => {
+        const [landlord] = await Db.insertUsers([Models.createLandlord()])
+        const [property] = await Db.insertProperties([
+          Models.createProperty({landlordId: landlord.id}),
+        ])
+
+        const [tenant] = await Db.insertUsers(
+          Models.createTenant({
+            landlordId: landlord.id,
+            residenceId: property.id,
+            email: 'tenant@gmail.com',
+          }),
+        )
+
+        const token = createToken(tenant)
+
+        const results = await request
+          .get('/api/properties/1')
+          .set('Authorization', token)
+
+        expect(results.status).toBe(200)
+        expect(results.body).toEqual(property)
+      })
+    })
     it('should return 200 status', async () => {
       const token = createToken(defaultLandlord)
 

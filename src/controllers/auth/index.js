@@ -16,7 +16,7 @@ async function createUser(req, res) {
       return res.status(400).json({message: 'Account not created'})
     }
 
-    const payload = {sub: email}
+    const payload = {email, type}
 
     const token = jwt.signToken(payload)
 

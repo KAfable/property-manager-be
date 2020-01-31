@@ -30,8 +30,8 @@ describe('Workorder Model', () => {
 
       // expected results
       expect(results.title).toBe('New Work order')
-      expect(results.propertyId).toBe(1)
-      expect(results.createdBy).toBe(2)
+      expect(results.property.id).toBe(1)
+      expect(results.createdBy.id).toBe(2)
     })
 
     it('Count of all Workorders should increase by 1', async () => {

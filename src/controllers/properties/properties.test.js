@@ -66,6 +66,7 @@ describe('getAllByUser', () => {
     const req = Express.mockRequest({
       user: {
         id: 1,
+        type: 'landlord',
       },
     })
 
@@ -75,5 +76,30 @@ describe('getAllByUser', () => {
 
     expect(res.status).toHaveBeenCalledWith(200)
     expect(res.json).toHaveBeenCalledWith(props)
+  })
+
+  it('should return the list of properties associated with a landlord', async () => {
+    const [landlord] = await Db.insertUsers(Models.createLandlord())
+    const properties = await Db.insertProperties(
+      Models.createProperty({landlordId: landlord.id}),
+    )
+    const [tenant] = await Db.insertUsers(
+      Models.createTenant({
+        residenceId: properties[0].id,
+        landlordId: landlord.id,
+        email: 'tenant@gmail.com',
+      }),
+    )
+
+    const req = Express.mockRequest({
+      user: tenant,
+    })
+
+    const res = Express.mockResponse()
+
+    await PropertyController.getAllByUser(req, res)
+
+    expect(res.status).toHaveBeenCalledWith(200)
+    expect(res.json).toHaveBeenCalledWith(properties)
   })
 })

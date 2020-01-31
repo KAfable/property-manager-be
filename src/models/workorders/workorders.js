@@ -1,5 +1,8 @@
+const Property = require('../property')
+const User = require('../user')
 // Work Order Models
 const db = require('../../../database/db')
+const {omit, map, pipeP} = require('ramda')
 
 const table = 'workorders as w'
 
@@ -18,14 +21,30 @@ module.exports = {
   remove,
 }
 
+async function getDetails(workorder) {
+  try {
+    const property = await Property.getProperty(workorder.propertyId)
+    const user = await User.findById(workorder.createdBy, '*')
+    const intermediate = omit(['propertyId', 'createdBy'], workorder)
+
+    return {...intermediate, property, createdBy: user}
+  } catch (err) {
+    console.error(err)
+  }
+}
+
+const getAllDetails = pipeP(map(getDetails))
+
 //#region - CREATE
 
 async function add(input, propertyId, userId) {
-  const results = await db(table)
-    .returning('id')
+  const workorders = await db(table)
+    .returning('*')
     .insert({...input, propertyId: propertyId, createdBy: userId})
 
-  return getById(results[0])
+  const [workorder] = await getAllDetails(workorders)
+
+  return workorder || null
 }
 
 //#endregion
@@ -39,12 +58,14 @@ async function get() {
 }
 
 async function getById(id) {
-  const [results] = await db
+  const results = await db
     .from(table)
     .select('*')
     .where({id})
 
-  return results || null
+  const [workorder] = await getAllDetails(results)
+
+  return workorder || null
 }
 
 function getAllByPropertyId(propertyId) {
@@ -76,13 +97,15 @@ async function getBy(query) {
 //#region - Update
 
 async function update(changes, id) {
-  const [results] = await db
+  const updates = await db
     .from(table)
     .update(changes)
     .where({id})
     .returning('*')
 
-  return results ? {updated: true, results} : {updated: false}
+  const [workorder] = await Promise.all(getAllDetails(updates))
+
+  return updates ? {updated: true, results: workorder} : {updated: false}
 }
 
 //#endregion
